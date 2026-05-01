@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlimited HEIC Converter</title>
-    <link rel="icon" type="Logo.png" href="Logo.png">
+    <title>Image Converter</title>
+<link rel="icon" type="Logo.png" href="Logo.png">
+    
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tailwind Configuration for Custom Theme Colors -->
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
@@ -32,18 +33,23 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Conversion Engines -->
+    <!-- Image Conversion Engines -->
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
-        /* Utility styles */
         .hidden-custom { display: none !important; }
         @keyframes spin { 
             from { transform: rotate(0deg); } 
             to { transform: rotate(360deg); } 
         }
         .animate-spin { animation: spin 1s linear infinite; }
+        
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #1F2937; border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #374151; }
     </style>
 </head>
 <body class="min-h-screen bg-theme-bg text-slate-200 font-sans p-4 md:p-8 selection:bg-theme-accent selection:text-theme-bg">
@@ -57,16 +63,16 @@
         </button>
     </div>
 
-    <div class="max-w-5xl mx-auto space-y-6">
+    <div class="max-w-6xl mx-auto space-y-6">
         
         <!-- Header -->
         <header class="text-center mb-10 mt-4">
             <div class="inline-flex items-center justify-center p-3.5 bg-theme-accent text-theme-bg rounded-2xl mb-5 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
                 <i data-lucide="image" class="w-8 h-8"></i>
             </div>
-            <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">Unlimited HEIC Converter</h1>
+            <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">Universal Image Converter</h1>
             <p class="text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
-                Batch convert your Apple HEIC photos to high-quality JPG or PNG instantly. 100% free and unlimited Made by JSB.
+                Batch convert any image format instantly in your browser. 100% free, and unlimited. Made by JSB
             </p>
         </header>
 
@@ -76,24 +82,28 @@
             <div class="lg:col-span-1 space-y-6">
                 
                 <!-- Settings Card -->
-                <div class="bg-theme-card rounded-2xl p-6 shadow-xl shadow-black/20 border border-theme-border">
-                    <div class="flex items-center gap-2 mb-5 text-white font-semibold">
-                        <i data-lucide="settings" class="w-[18px] h-[18px] text-theme-accent"></i>
+                <div class="bg-theme-card rounded-2xl p-6 shadow-xl shadow-black/20 border border-theme-border flex flex-col gap-6">
+                    <div class="flex items-center gap-2 text-white font-semibold border-b border-theme-border pb-4">
+                        <i data-lucide="settings" class="w-5 h-5 text-theme-accent"></i>
                         <h2>Conversion Settings</h2>
                     </div>
                     
-                    <div class="space-y-6">
+                    <div class="space-y-4">
                         <div class="space-y-3">
-                            <label class="text-sm font-medium text-slate-400">Output Format</label>
-                            <div class="flex bg-[#0A0D14] p-1.5 rounded-lg border border-theme-border">
-                                <button id="btn-jpg" class="flex-1 py-1.5 text-sm font-medium rounded-md transition-all bg-theme-accent text-theme-bg shadow-sm">JPG</button>
-                                <button id="btn-png" class="flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white">PNG</button>
-                            </div>
+                            <label class="text-sm font-medium text-slate-300">Output Format</label>
+                            <select id="image-format" class="w-full bg-[#0A0D14] border border-theme-border text-white text-sm rounded-lg focus:ring-theme-accent focus:border-theme-accent block p-2.5 outline-none transition-colors">
+                                <option value="image/jpeg" selected>JPG (Standard)</option>
+                                <option value="image/png">PNG (Transparent)</option>
+                                <option value="image/webp">WEBP (Web Optimized)</option>
+                                <option value="image/bmp">BMP (Bitmap)</option>
+                                <option value="image/gif">GIF (Static)</option>
+                                <option value="image/tiff">TIFF (High Quality)</option>
+                                <option value="image/x-icon">ICO (Icon)</option>
+                            </select>
                         </div>
-
-                        <div id="quality-container" class="space-y-3 transition-opacity">
+                        <div id="image-quality-container" class="space-y-3 transition-opacity">
                             <div class="flex justify-between items-center">
-                                <label class="text-sm font-medium text-slate-400">JPG Quality</label>
+                                <label class="text-sm font-medium text-slate-300">Quality</label>
                                 <span id="quality-value" class="text-xs font-bold text-theme-accent bg-theme-accentMuted px-2.5 py-1 rounded-full">80%</span>
                             </div>
                             <input id="quality-input" type="range" min="0.1" max="1" step="0.1" value="0.8" class="w-full accent-theme-accent h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer outline-none" />
@@ -103,12 +113,13 @@
 
                 <!-- Dropzone -->
                 <div id="dropzone" class="bg-theme-card rounded-2xl p-8 shadow-xl shadow-black/20 border-2 border-dashed border-theme-border hover:border-theme-accent hover:bg-theme-cardHover transition-all duration-300 cursor-pointer group text-center flex flex-col items-center justify-center min-h-[220px]">
-                    <input type="file" id="fileInput" class="hidden" multiple accept=".heic,.heif" />
+                    <!-- Accepts virtually all standard image types plus HEIC/HEIF -->
+                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.heic,.heif" />
                     <div class="bg-theme-accentMuted text-theme-accent p-4 rounded-2xl mb-5 group-hover:scale-110 transition-transform duration-300">
                         <i data-lucide="upload-cloud" class="w-8 h-8"></i>
                     </div>
-                    <h3 class="font-semibold text-white mb-2 text-lg">Drag & Drop HEIC files</h3>
-                    <p class="text-sm text-slate-400">or click to browse your computer</p>
+                    <h3 class="font-semibold text-white mb-2 text-lg">Drag & Drop Images</h3>
+                    <p class="text-sm text-slate-400">or click to browse your files</p>
                 </div>
                 
                 <!-- Main Action Button -->
@@ -145,8 +156,10 @@
                     <!-- List Body -->
                     <div class="flex-1 p-3 overflow-y-auto max-h-[600px] custom-scrollbar">
                         <div id="empty-state" class="h-full flex flex-col items-center justify-center text-slate-500 p-8 space-y-4 min-h-[300px]">
-                            <i data-lucide="image" class="w-14 h-14 opacity-20"></i>
-                            <p class="text-center text-sm leading-relaxed">No files uploaded yet.<br/>Drag and drop files to get started.</p>
+                            <div class="flex items-center gap-2 opacity-20">
+                                <i data-lucide="image" class="w-16 h-16"></i>
+                            </div>
+                            <p class="text-center text-sm leading-relaxed">No images uploaded yet.<br/>Drag and drop images to start converting.</p>
                         </div>
                         
                         <ul id="file-list" class="space-y-2 p-1">
@@ -159,23 +172,6 @@
         </div>
     </div>
 
-    <style>
-        /* Custom scrollbar for dark theme */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #1F2937;
-            border-radius: 20px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background-color: #374151;
-        }
-    </style>
-
     <script>
         // Initialize Icons
         lucide.createIcons();
@@ -183,12 +179,12 @@
         // Application State
         const state = {
             files: [],
-            outputFormat: 'image/jpeg',
-            quality: 0.8,
+            imageOutputFormat: 'image/jpeg',
+            imageQuality: 0.8,
             isConverting: false
         };
 
-        // Format Size Helper
+        // --- Helpers ---
         function formatSize(bytes) {
             if (!bytes) return '0 B';
             const k = 1024;
@@ -197,22 +193,39 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        // Get matching icon for file status
         function getStatusIconHTML(status) {
-            if (status === 'pending') return '<i data-lucide="image" class="w-[18px] h-[18px] text-slate-500"></i>';
+            if (status === 'pending') return '<i data-lucide="clock" class="w-[18px] h-[18px] text-slate-500"></i>';
             if (status === 'converting') return '<i data-lucide="loader-2" class="w-[18px] h-[18px] text-theme-accent animate-spin"></i>';
             if (status === 'done') return '<i data-lucide="check-circle-2" class="w-[18px] h-[18px] text-theme-accent"></i>';
             if (status === 'error') return '<i data-lucide="alert-circle" class="w-[18px] h-[18px] text-red-400"></i>';
             return '';
         }
 
-        // Error Toast Logic
+        function getMediaType(file) {
+            if (file.type.startsWith('image/') || file.name.match(/\.(heic|heif)$/i)) return 'image';
+            return 'unknown';
+        }
+
+        function getNewExtension() {
+            const map = {
+                'image/jpeg': '.jpg',
+                'image/png': '.png',
+                'image/webp': '.webp',
+                'image/bmp': '.bmp',
+                'image/gif': '.gif',
+                'image/tiff': '.tiff',
+                'image/x-icon': '.ico'
+            };
+            return map[state.imageOutputFormat] || '.png';
+        }
+
+        // --- Error Toast ---
         function showError(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').textContent = msg;
             toast.classList.remove('hidden');
             toast.classList.add('flex');
-            setTimeout(hideError, 4000);
+            setTimeout(hideError, 4500);
         }
 
         function hideError() {
@@ -222,60 +235,8 @@
         }
         document.getElementById('toastClose').addEventListener('click', hideError);
 
-        // Core Render Function: Syncs UI with Application State
-        function render() {
-            // 1. Settings Menu UI
-            const btnJpg = document.getElementById('btn-jpg');
-            const btnPng = document.getElementById('btn-png');
-            const qualityDiv = document.getElementById('quality-container');
-
-            if (state.outputFormat === 'image/jpeg') {
-                btnJpg.className = 'flex-1 py-1.5 text-sm font-medium rounded-md transition-all bg-theme-accent text-theme-bg shadow-sm';
-                btnPng.className = 'flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white';
-                qualityDiv.classList.remove('hidden-custom');
-            } else {
-                btnPng.className = 'flex-1 py-1.5 text-sm font-medium rounded-md transition-all bg-theme-accent text-theme-bg shadow-sm';
-                btnJpg.className = 'flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-white';
-                qualityDiv.classList.add('hidden-custom');
-            }
-
-            // 2. Queue UI
-            const listContainer = document.getElementById('file-list');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (state.files.length === 0) {
-                emptyState.classList.remove('hidden-custom');
-                listContainer.innerHTML = '';
-            } else {
-                emptyState.classList.add('hidden-custom');
-                listContainer.innerHTML = state.files.map(file => `
-                    <li class="group flex items-center gap-4 p-3 hover:bg-theme-cardHover rounded-xl transition-colors border border-transparent hover:border-theme-border">
-                        <div class="shrink-0 flex items-center justify-center w-11 h-11 rounded-lg bg-[#0A0D14] border border-theme-border/50">
-                            ${getStatusIconHTML(file.status)}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-200 truncate" title="${file.name}">${file.name}</p>
-                            <div class="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                                <span>${formatSize(file.size)}</span>
-                                ${file.convertedSize ? `<span class="text-slate-600">→</span><span class="text-theme-accent font-medium">${formatSize(file.convertedSize)}</span>` : ''}
-                                ${file.status === 'error' ? `<span class="text-red-400 font-medium">Failed</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
-                            ${file.status === 'done' ? `
-                                <button onclick="window.downloadFile('${file.id}')" class="p-2 text-theme-accent hover:bg-theme-accentMuted rounded-lg transition-colors" title="Download">
-                                    <i data-lucide="download" class="w-4 h-4"></i>
-                                </button>
-                            ` : ''}
-                            <button onclick="window.removeFile('${file.id}')" ${state.isConverting && file.status === 'converting' ? 'disabled' : ''} class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50" title="Remove">
-                                <i data-lucide="x" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </li>
-                `).join('');
-            }
-            
-            // 3. Update Text and Action Buttons
+        // --- Core UI Updaters ---
+        function renderUI() {
             const pendingCount = state.files.filter(f => f.status === 'pending' || f.status === 'error').length;
             const doneCount = state.files.filter(f => f.status === 'done').length;
             
@@ -291,7 +252,7 @@
                 if (state.isConverting) {
                     convertBtn.innerHTML = `<i data-lucide="loader-2" class="w-[18px] h-[18px] animate-spin"></i> Converting...`;
                 } else {
-                    convertBtn.innerHTML = `<i data-lucide="image" class="w-[18px] h-[18px]"></i> Convert ${pendingCount > 0 ? pendingCount : ''} Files`;
+                    convertBtn.innerHTML = `<i data-lucide="zap" class="w-[18px] h-[18px]"></i> Convert ${pendingCount > 0 ? pendingCount : ''} Images`;
                 }
             } else {
                 convertBtnWrapper.classList.add('hidden-custom');
@@ -308,35 +269,105 @@
             } else {
                 actionsContainer.classList.add('hidden-custom');
             }
-            
-            // Re-render lucide icons for newly injected HTML
             lucide.createIcons();
         }
 
-        // Handle Adding Files
+        function renderList() {
+            const listContainer = document.getElementById('file-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (state.files.length === 0) {
+                emptyState.classList.remove('hidden-custom');
+                listContainer.innerHTML = '';
+            } else {
+                emptyState.classList.add('hidden-custom');
+                listContainer.innerHTML = state.files.map(file => `
+                    <li id="file-item-${file.id}" class="group flex items-center gap-4 p-3 hover:bg-theme-cardHover rounded-xl transition-colors border border-transparent hover:border-theme-border">
+                        <div class="status-icon shrink-0 flex items-center justify-center w-11 h-11 rounded-lg bg-[#0A0D14] border border-theme-border/50">
+                            <!-- Populated by updateFileUI -->
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-slate-200 truncate" title="${file.name}">${file.name}</p>
+                            <div class="details-container flex flex-col mt-1">
+                                <!-- Populated by updateFileUI -->
+                            </div>
+                        </div>
+                        <div class="actions-container flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
+                            <!-- Populated by updateFileUI -->
+                        </div>
+                    </li>
+                `).join('');
+                
+                state.files.forEach(file => updateFileUI(file));
+            }
+        }
+
+        function updateFileUI(file) {
+            const li = document.getElementById(`file-item-${file.id}`);
+            if (!li) return;
+            
+            li.querySelector('.status-icon').innerHTML = getStatusIconHTML(file.status);
+
+            const extBadge = file.status === 'done' && file.convertedExtension 
+                ? file.convertedExtension.replace('.', '') 
+                : getNewExtension().replace('.', '');
+
+            li.querySelector('.details-container').innerHTML = `
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <span>${formatSize(file.size)}</span>
+                    ${file.status === 'done' ? `
+                        <span class="text-slate-600">→</span>
+                        <span class="text-theme-accent font-medium">${formatSize(file.convertedSize)}</span>
+                        <span class="ml-auto text-theme-accent bg-theme-accentMuted px-2 py-[2px] rounded text-[10px] uppercase font-bold tracking-wide">${extBadge}</span>
+                    ` : ''}
+                    ${file.status === 'error' ? `<span class="text-red-400 font-medium truncate max-w-[150px]" title="${file.errorMessage || 'Failed'}">${file.errorMessage || 'Failed'}</span>` : ''}
+                </div>
+            `;
+
+            li.querySelector('.actions-container').innerHTML = `
+                ${file.status === 'done' ? `
+                    <button onclick="window.downloadFile('${file.id}')" class="p-2 text-theme-accent hover:bg-theme-accentMuted rounded-lg transition-colors focus:opacity-100" title="Download">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                    </button>
+                ` : ''}
+                <button onclick="window.removeFile('${file.id}')" ${state.isConverting && file.status === 'converting' ? 'disabled' : ''} class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50 focus:opacity-100" title="Remove">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            `;
+            lucide.createIcons({ root: li });
+        }
+
+        // --- File Handling & Listeners ---
         function processSelectedFiles(selectedFiles) {
             const newFiles = Array.from(selectedFiles)
-                .filter(f => f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif'))
-                .map(f => ({
-                    id: Math.random().toString(36).substring(2, 9),
-                    originalFile: f,
-                    name: f.name,
-                    size: f.size,
-                    status: 'pending',
-                    convertedBlobUrl: null,
-                    convertedSize: null
-                }));
+                .map(f => {
+                    const type = getMediaType(f);
+                    if (type !== 'image') return null; // Reject anything that isn't an image
+                    
+                    return {
+                        id: Math.random().toString(36).substring(2, 9),
+                        originalFile: f,
+                        name: f.name,
+                        size: f.size,
+                        status: 'pending',
+                        convertedBlobUrl: null,
+                        convertedSize: null,
+                        convertedExtension: null,
+                        errorMessage: null
+                    };
+                })
+                .filter(f => f !== null);
                 
             if (newFiles.length === 0 && selectedFiles.length > 0) {
-                showError('Please select valid .HEIC or .HEIF files.');
+                showError('Please select valid image files.');
                 return;
             }
             
             state.files.push(...newFiles);
-            render();
+            renderList();
+            renderUI();
         }
 
-        // Drag and Drop Listeners
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
 
@@ -359,86 +390,128 @@
             e.target.value = '';
         });
 
-        // Format and Settings Listeners
-        document.getElementById('btn-jpg').addEventListener('click', () => {
-            state.outputFormat = 'image/jpeg';
-            render();
+        // Settings Listeners
+        document.getElementById('image-format').addEventListener('change', e => {
+            state.imageOutputFormat = e.target.value;
+            const qualityDiv = document.getElementById('image-quality-container');
+            // Quality slider is primarily effective for JPEG and WEBP
+            if (state.imageOutputFormat === 'image/jpeg' || state.imageOutputFormat === 'image/webp') {
+                qualityDiv.classList.remove('hidden-custom');
+            } else {
+                qualityDiv.classList.add('hidden-custom');
+            }
+            
+            // Update extension badges on pending items visually
+            state.files.forEach(f => { if(f.status === 'pending') updateFileUI(f); });
         });
-        document.getElementById('btn-png').addEventListener('click', () => {
-            state.outputFormat = 'image/png';
-            render();
-        });
-        
+
         const qualityInput = document.getElementById('quality-input');
         const qualityValue = document.getElementById('quality-value');
         qualityInput.addEventListener('input', e => {
-            state.quality = parseFloat(e.target.value);
-            qualityValue.textContent = Math.round(state.quality * 100) + '%';
+            state.imageQuality = parseFloat(e.target.value);
+            qualityValue.textContent = Math.round(state.imageQuality * 100) + '%';
         });
 
-        // Conversion Engine
-        async function convertFiles() {
-            if (typeof heic2any === 'undefined') {
-                showError('Conversion engine is still loading. Please wait a moment.');
-                return;
-            }
+        // --- Conversion Engine ---
+        async function convertImage(fileObj) {
+            const format = state.imageOutputFormat;
+            const quality = state.imageQuality;
             
+            let blob = fileObj.originalFile;
+
+            // 1. Process HEIC/HEIF files first
+            if (blob.name.match(/\.(heic|heif)$/i)) {
+                if (typeof heic2any === 'undefined') throw new Error("HEIC engine not loaded");
+                
+                // If requested format is natively supported by heic2any, run directly
+                if (['image/jpeg', 'image/png', 'image/gif'].includes(format)) {
+                    let result = await heic2any({ blob: blob, toType: format, quality: format === 'image/jpeg' ? quality : undefined });
+                    return Array.isArray(result) ? result[0] : result;
+                } else {
+                    // Otherwise, convert HEIC to a standard PNG first, then pass down to HTML canvas
+                    let result = await heic2any({ blob: blob, toType: 'image/png' });
+                    blob = Array.isArray(result) ? result[0] : result;
+                }
+            }
+
+            // 2. Process all image types using native Canvas 
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const url = URL.createObjectURL(blob);
+                img.onload = () => {
+                    URL.revokeObjectURL(url);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    canvas.toBlob(outBlob => {
+                        // Some older browsers default to PNG if the format isn't supported. That's a safe fallback.
+                        if (outBlob) resolve(outBlob);
+                        else reject(new Error("Image extraction failed for this format."));
+                    }, format, quality);
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error("Failed to read image data format"));
+                };
+                img.src = url;
+            });
+        }
+
+        // --- Main Controller ---
+        async function convertFiles() {
             state.isConverting = true;
-            render();
+            renderUI();
 
             for (let i = 0; i < state.files.length; i++) {
-                if (state.files[i].status === 'done') continue;
+                const file = state.files[i];
+                if (file.status === 'done') continue;
                 
-                state.files[i].status = 'converting';
-                render();
+                file.status = 'converting';
+                file.errorMessage = null;
+                updateFileUI(file);
 
                 try {
-                    const convertedBlob = await heic2any({
-                        blob: state.files[i].originalFile,
-                        toType: state.outputFormat,
-                        quality: state.outputFormat === 'image/jpeg' ? state.quality : undefined
-                    });
+                    let blob = await convertImage(file);
 
-                    // heic2any might return an array if HEIC has multiple images
-                    const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-                    const blobUrl = URL.createObjectURL(finalBlob);
-
-                    state.files[i].status = 'done';
-                    state.files[i].convertedBlobUrl = blobUrl;
-                    state.files[i].convertedSize = finalBlob.size;
+                    file.status = 'done';
+                    file.convertedBlobUrl = URL.createObjectURL(blob);
+                    file.convertedSize = blob.size;
+                    file.convertedExtension = getNewExtension();
                 } catch(error) {
                     console.error("Conversion error:", error);
-                    state.files[i].status = 'error';
+                    file.status = 'error';
+                    file.errorMessage = error.message || "Conversion failed";
                 }
                 
-                render();
-                // Brief pause to allow browser UI thread to catch up visually
+                updateFileUI(file);
+                // Tiny breathing room to prevent browser thread locking up
                 await new Promise(r => setTimeout(r, 50)); 
             }
             
             state.isConverting = false;
-            render();
+            renderUI();
         }
 
-        // Global functions for inline HTML button clicks
+        // Global Actions
         window.downloadFile = function(id) {
             const file = state.files.find(f => f.id === id);
             if (!file || !file.convertedBlobUrl) return;
             
             const a = document.createElement('a');
             a.href = file.convertedBlobUrl;
-            const ext = state.outputFormat === 'image/jpeg' ? '.jpg' : '.png';
-            a.download = file.name.replace(/\.heic|\.heif/i, ext);
+            // Trim old extension and apply new extension
+            const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            a.download = baseName + file.convertedExtension;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         };
         
         window.removeFile = function(id) {
-            if (state.isConverting) {
-                const file = state.files.find(f => f.id === id);
-                if (file && file.status === 'converting') return;
-            }
+            if (state.isConverting) return; // Prevent deleting while processing queue
             
             const index = state.files.findIndex(f => f.id === id);
             if (index > -1) {
@@ -446,11 +519,11 @@
                     URL.revokeObjectURL(state.files[index].convertedBlobUrl);
                 }
                 state.files.splice(index, 1);
-                render();
+                renderList();
+                renderUI();
             }
         };
 
-        // Actions Listeners
         document.getElementById('convert-btn').addEventListener('click', convertFiles);
         
         document.getElementById('clear-btn').addEventListener('click', () => {
@@ -459,7 +532,8 @@
                 if (f.convertedBlobUrl) URL.revokeObjectURL(f.convertedBlobUrl);
             });
             state.files = [];
-            render();
+            renderList();
+            renderUI();
         });
 
         document.getElementById('zip-btn').addEventListener('click', async () => {
@@ -472,9 +546,18 @@
             const doneFiles = state.files.filter(f => f.status === 'done');
             if (doneFiles.length === 0) return;
             
+            const names = new Set();
             doneFiles.forEach(file => {
-                const ext = state.outputFormat === 'image/jpeg' ? '.jpg' : '.png';
-                const fileName = file.name.replace(/\.heic|\.heif/i, ext);
+                let baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                let ext = file.convertedExtension;
+                let fileName = baseName + ext;
+                let counter = 1;
+                // Prevent duplicate naming if identically named files are uploaded
+                while(names.has(fileName)) {
+                    fileName = `${baseName}_${counter}${ext}`;
+                    counter++;
+                }
+                names.add(fileName);
                 zip.file(fileName, fetch(file.convertedBlobUrl).then(res => res.blob()));
             });
             
@@ -482,7 +565,7 @@
                 const content = await zip.generateAsync({ type: 'blob' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(content);
-                a.download = 'Converted_HEIC_Images.zip';
+                a.download = 'Converted_Images.zip';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
